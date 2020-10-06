@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class Board implements Serializable {
 
-    private Long boardNo;
+    private Integer boardNo;
     @NonNull
     private String title;
     private String writer;

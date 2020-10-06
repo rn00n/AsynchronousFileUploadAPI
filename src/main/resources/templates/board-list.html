@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+</head>
+<body>
+
+    <h1>Ajax Home</h1>
+    <div class="container">
+        <form>
+            <div class="form-group">
+                <label>게시판 번호</label>
+                <input class="form-control" type="text" id="boardNo" name="boardNo"/>
+            </div>
+            <div class="form-group">
+                <label>제목</label>
+                <input class="form-control" type="text" id="title" name="title"/>
+            </div>
+            <div class="form-group">
+                <label>내용</label>
+                <input class="form-control" type="text" id="content" name="content"/>
+            </div>
+            <div class="form-group">
+                <label>작성자</label>
+                <input class="form-control" type="text" id="writer" name="writer"/>
+            </div>
+        </form>
+        <div>
+            <button id="listBtn">목록</button>
+            <button id="registerBtn">등록</button>
+            <button id="readBtn">조회</button>
+            <button id="modifyBtn">수정</button>
+            <button id="deleteBtn">삭제</button>
+        </div>
+    </div>
+
+<!--    csrf token-->
+    <script type="application/javascript" th:inline="javascript">
+        $(function() {
+            var csrfToken = /*[[${_csrf.token}]]*/ null;
+            var csrfHeader = /*[[${_csrf.headerName}]]*/ null;
+            $(document).ajaxSend(function (e, xhr, options) {
+                xhr.setRequestHeader(csrfHeader, csrfToken);
+            });
+        });
+    </script>
+<!--    API 호출-->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#listBtn').on('click', function () {
+                $.get("/boards", function (data) {
+                    console.log(data);
+                    alert(JSON.stringify(data));
+                });
+            });
+            $('#registerBtn').on('click', function () {
+                var title = $('#title');
+                var content = $('#content');
+                var writer = $('#writer');
+
+                var titleVal = title.val();
+                var contentVal = content.val();
+                var writerVal = writer.val();
+
+                var boardObject = {
+                    title: titleVal,
+                    content: contentVal,
+                    writer: writerVal
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: '/boards',
+                    data: JSON.stringify(boardObject),
+                    contentType: 'application/json;charset=UTF-8',
+                    success: function (result) {
+                        console.log(result);
+                        alert(result);
+                    },
+                    error: function (request, status, error) {
+                        alert('code: ' + request.status + '\n' + 'message: ' + request.responseText + '\n' + 'error: ' + error);
+                    }
+                });
+            });
+            $('#readBtn').on('click', function () {
+                var boardNo = $('#boardNo');
+                var boardNoVal = boardNo.val();
+                console.log(boardNoVal);
+
+                $.get("/boards/" + boardNoVal, function (data) {
+                    console.log(data);
+                    alert(JSON.stringify(data));
+                });
+            });
+            $('#deleteBtn').on('click', function () {
+                var boardNo = $('#boardNo');
+                var boardNoVal = boardNo.val();
+
+                console.log(boardNoVal);
+
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/boards/' + boardNoVal,
+                    success: function (result) {
+                        console.log(result);
+                        alert(result);
+                    }
+                });
+            });
+            $('#modifyBtn').on('click', function () {
+                var boardNo = $('#boardNo');
+                var title = $('#title');
+                var content = $('#content');
+                var writer = $('#writer');
+
+                var boardNoVal = boardNo.val();
+                var titleVal = title.val();
+                var contentVal = content.val();
+                var writerVal = writer.val();
+
+                var boardObject = {
+                    boardNo: boardNoVal,
+                    title: titleVal,
+                    content: contentVal,
+                    writer: writerVal
+                };
+
+                $.ajax({
+                    type: 'PUT',
+                    url: '/boards/' + boardNoVal,
+                    data: JSON.stringify(boardObject),
+                    contentType: 'application/json;charset=UTF-8',
+                    success: function (result) {
+                        console.log(result);
+                        alert(result);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
