@@ -11,7 +11,7 @@
 </head>
 <body>
 
-    <h1>Ajax Home</h1>
+    <h1>Board API</h1>
     <div class="container">
         <form>
             <div class="form-group">
@@ -32,11 +32,14 @@
             </div>
         </form>
         <div>
-            <button id="listBtn">목록</button>
-            <button id="registerBtn">등록</button>
-            <button id="readBtn">조회</button>
-            <button id="modifyBtn">수정</button>
-            <button id="deleteBtn">삭제</button>
+            <button class="btn btn-outline-dark" id="listBtn">목록</button>
+            <button class="btn btn-outline-dark" id="registerBtn">등록</button>
+            <button class="btn btn-outline-dark" id="readBtn">조회</button>
+            <button class="btn btn-outline-dark" id="getToJsonBtn">조회Json</button>
+            <button class="btn btn-outline-dark" id="getToXmlBtn">조회Xml</button>
+            <button class="btn btn-outline-dark" id="modifyByJsonBtn">수정Json</button>
+            <button class="btn btn-outline-dark" id="modifyByXmlBtn">수정Xml</button>
+            <button class="btn btn-outline-dark" id="deleteBtn">삭제</button>
         </div>
     </div>
 
@@ -97,6 +100,40 @@
                     alert(JSON.stringify(data));
                 });
             });
+            $('#getToJsonBtn').on('click', function () {
+                var boardNo = $('#boardNo');
+                var boardNoVal = boardNo.val();
+                console.log(boardNoVal);
+                alert('json');
+                $.ajax({
+                    type: 'GET',
+                    url: '/boards/' + boardNoVal,
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    success: function (result) {
+                        console.log('result: ' + result);
+                        alert(JSON.stringify(result));
+                    }
+                });
+            });
+            $('#getToXmlBtn').on('click', function () {
+                var boardNo = $('#boardNo');
+                var boardNoVal = boardNo.val();
+                console.log(boardNoVal);
+                alert('xml');
+                $.ajax({
+                    type: 'GET',
+                    url: '/boards/' + boardNoVal,
+                    headers: {
+                        'Accept': 'application/xml'
+                    },
+                    success: function (result) {
+                        console.log('result: ' + result);
+                        alert(xmlToString(result));
+                    }
+                });
+            });
             $('#deleteBtn').on('click', function () {
                 var boardNo = $('#boardNo');
                 var boardNoVal = boardNo.val();
@@ -112,7 +149,7 @@
                     }
                 });
             });
-            $('#modifyBtn').on('click', function () {
+            $('#modifyByJsonBtn').on('click', function () {
                 var boardNo = $('#boardNo');
                 var title = $('#title');
                 var content = $('#content');
@@ -129,7 +166,6 @@
                     content: contentVal,
                     writer: writerVal
                 };
-
                 $.ajax({
                     type: 'PUT',
                     url: '/boards/' + boardNoVal,
@@ -141,7 +177,75 @@
                     }
                 });
             });
+            $('#modifyByXmlBtn').on('click', function () {
+                var boardNo = $('#boardNo');
+                var title = $('#title');
+                var content = $('#content');
+                var writer = $('#writer');
+
+                var boardNoVal = boardNo.val();
+                var titleVal = title.val();
+                var contentVal = content.val();
+                var writerVal = writer.val();
+
+                var xmlData = '<Board>';
+                xmlData += '<boardNo>0</boardNo>';
+                xmlData += '<title>title1</title>';
+                xmlData += '<content>content1</content>';
+                xmlData += '<writer>writer1</writer>';
+                xmlData += '<regDate>2018-12-10</regDate>';
+                xmlData += '</Board>';
+                $.ajax({
+                    type: 'PUT',
+                    url: '/boards/' + boardNoVal,
+                    data: xmlData,
+                    contentType: 'application/xml;charset=UTF-8',
+                    success: function (result) {
+                        console.log(result);
+                        alert(result);
+                    }
+                });
+            });
+            $('#postBtn').on('click', function () {
+                var boardNo = $('#boardNo')                                                                                                            ;
+                var title = $('#title')                                                                                                            ;
+                var content = $('#content')                                                                                                            ;
+                var writer = $('#writer')                                                                                                            ;
+
+                var boardNoVal = boardNo.val();
+                var titleVal = title.val();
+                var contentVal = content.val();
+                var writerVal = writer.val();
+
+                var boardObject = {
+                    boardNo: boardNoVal,
+                    title: titleVal,
+                    content: contentVal,
+                    writer: writerVal,
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/boards/' + boardNoVal,
+                    data: JSON.stringify(boardObject),
+                    contentType: 'application/json;charset=UTF-8',
+                    success: function (result) {
+                        console.log('result: ', result);
+                        alert(result);
+                    }
+                });
+            });
         });
+
+        function xmlToString(xmlData) {
+            var xmlString;
+            if (window.ActiveXObject) {
+                xmlString = xmlData.xml;
+            } else {
+                xmlString = (new XMLSerializer()).serializeToString(xmlData);
+            }
+            return xmlString;
+        }
     </script>
 </body>
 </html>

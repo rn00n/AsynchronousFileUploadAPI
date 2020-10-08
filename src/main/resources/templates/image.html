@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+</head>
+<body>
+
+<h1>Image API</h1>
+<div class="container">
+    <hr/>
+    <form>
+        <div class="form-group">
+            <label>번호</label>
+            <input class="form-control" type="text" id="imageNo" name="imageNo" value="1"/>
+        </div>
+    </form>
+    <div>
+        <button class="btn btn-outline-dark" id="imageToByte1Btn">이미지 byte[]</button>
+        <button class="btn btn-outline-dark" id="imageToByte2Btn">이미지 다운로드</button>
+    </div>
+    <hr/>
+    <form>
+        <div class="custom-file">
+            <input type="file" class="custom-file-input" id="inputFile">
+            <label class="custom-file-label" for="inputFile">파일 업로드</label>
+        </div>
+    </form>
+</div>
+
+<!--    csrf token-->
+<script type="application/javascript" th:inline="javascript">
+    $(function() {
+        var csrfToken = /*[[${_csrf.token}]]*/ null;
+        var csrfHeader = /*[[${_csrf.headerName}]]*/ null;
+        $(document).ajaxSend(function (e, xhr, options) {
+            xhr.setRequestHeader(csrfHeader, csrfToken);
+        });
+    });
+</script>
+<!--    API 호출-->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#imageToByteBtn').on('click',function () {
+            var imageNo = $('#imageNo');
+            var imageNoVal = imageNo.val();
+            $.ajax({
+                type: 'GET',
+                url: '/images/byte1/' + imageNoVal,
+                contentType: 'application/json;charset=UTF-8',
+                success: function (data) {
+                    console.log(data);
+                    alert(JSON.stringify(data));
+                },
+                error: function (xhr, status, error) {
+                    alert('code: ' + xhr.status + '\n'
+                        + 'message: ' + xhr.responseText + '\n'
+                        + 'error: ' + error);
+                }
+            });
+        });
+        $('#imageToByte2Btn').on('click', function () {
+            var imageNo = $('#imageNo');
+            var imageNoVal = imageNo.val();
+            $.ajax({
+                type: 'GET',
+                url: '/images/byte2/' + imageNoVal,
+                contentType: 'application/json;charset=UTF-8',
+                success: function (data) {
+                    console.log(data);
+                    alert(JSON.stringify(data));
+                },
+                error: function (xhr, status, error) {
+                    alert('code: ' + xhr.status + '\n'
+                        + 'message: ' + xhr.responseText + '\n'
+                        + 'error: ' + error);
+                }
+            });
+        });
+        $('#inputFile').on('change', function () {
+            console.log("change");
+            var files = event.target.files;
+            var file = files[0];
+            console.log(file);
+            var formData = new FormData();
+            formData.append('file', file);
+            $.ajax({
+                type: 'POST',
+                url: '/images/upload',
+                data: formData,
+                dataType: 'text',
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    alert(data);
+                }
+            });
+        });
+    });
+
+    function xmlToString(xmlData) {
+        var xmlString;
+        if (window.ActiveXObject) {
+            xmlString = xmlData.xml;
+        } else {
+            xmlString = (new XMLSerializer()).serializeToString(xmlData);
+        }
+        return xmlString;
+    }
+</script>
+</body>
+</html>

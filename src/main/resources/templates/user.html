@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+</head>
+<body>
+
+<h1>Member API</h1>
+<div class="container">
+    <hr/>
+    <form>
+        <div class="form-group">
+            <label>유저ID</label>
+            <input class="form-control" type="text" id="userId" value="user"/>
+        </div>
+        <div class="form-group">
+            <label>패스워드</label>
+            <input class="form-control" type="text" id="password" value="1234"/>
+        </div>
+        <div class="form-group">
+            <label>이름</label>
+            <input class="form-control" type="text" id="username" value="홍길동"/>
+        </div>
+        <div class="form-group">
+            <label>이메일</label>
+            <input class="form-control" type="text" id="email" value="email@email.com"/>
+        </div>
+        <div class="form-group">
+            <label>생년월일</label>
+            <input class="form-control" type="text" id="dateOfBirth" value="1995-05-24"/>
+        </div>
+
+        <div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="gender" id="gender1" value="male">
+                <label class="form-check-label" for="gender1">Male</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="gender" id="gender2" value="female" checked>
+                <label class="form-check-label" for="gender2">Female</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="gender" id="gender3" value="other">
+                <label class="form-check-label" for="gender3">Other</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>우편번호</label>
+            <input class="form-control" type="text" id="postCode" value="15366"/>
+        </div>
+        <div class="form-group">
+            <label>주소</label>
+            <input class="form-control" type="text" id="location" value="경기도 안산시 단원구 선부동 961 어반스퀘어 102동 1804호"/>
+        </div>
+
+        <div class="form-group">
+            <label>카드1 - 번호</label>
+            <input class="form-control" type="text" id="card1" value="123456"/>
+        </div>
+        <div class="form-group">
+            <label>카드1 - 유효년월</label>
+            <input class="form-control" type="text" id="validMonth1" value="2021-05-24"/>
+        </div>
+
+        <div class="form-group">
+            <label>카드2 - 번호</label>
+            <input class="form-control" type="text" id="card2" value="654321"/>
+        </div>
+        <div class="form-group">
+            <label>카드2 - 유효년월</label>
+            <input class="form-control" type="text" id="validMonth2" value="2022-05-24"/>
+        </div>
+    </form>
+    <div>
+        <button class="btn btn-outline-dark" id="registerBtn">등록</button>
+    </div>
+    <hr/>
+</div>
+
+<!--    csrf token-->
+<script type="application/javascript" th:inline="javascript">
+    $(function() {
+        var csrfToken = /*[[${_csrf.token}]]*/ null;
+        var csrfHeader = /*[[${_csrf.headerName}]]*/ null;
+        $(document).ajaxSend(function (e, xhr, options) {
+            xhr.setRequestHeader(csrfHeader, csrfToken);
+        });
+    });
+</script>
+<!--    API 호출-->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#registerBtn').on('click',function () {
+            var userId = $('#userId');
+            var password = $('#password');
+            var username = $('#username');
+            var email = $('#email');
+            var gender = $('input[name=gender]:checked');
+            var dateOfBirth = $('#dateOfBirth');
+            var postCode = $('#postCode');
+            var location = $('#location');
+            var card1 = $('#card1');
+            var validMonth1 = $('#validMonth1');
+            var card2 = $('#card2');
+            var validMonth2 = $('#validMonth2');
+
+            var userIdVal = userId.val();
+            var passwordVal = password.val();
+            var usernameVal = username.val();
+            var emailVal = email.val();
+            var genderVal = gender.val();
+            var dateOfBirthVal = dateOfBirth.val();
+            var postCodeVal = postCode.val();
+            var locationVal = location.val();
+            var card1Val = card1.val();
+            var validMonth1Val = validMonth1.val();
+            var card2Val = card2.val();
+            var validMonth2Val = validMonth2.val();
+
+            var userObject = {
+                userId:userIdVal,
+                password:passwordVal,
+                username:usernameVal,
+                email:emailVal,
+                gender:genderVal,
+                dateOfBirth:dateOfBirthVal,
+                address: {
+                    postCode:postCodeVal,
+                    location:locationVal
+                },
+                cardList:[
+                    {
+                        no:card1Val,
+                        validMonth:validMonth1Val
+                    },
+                    {
+                        no:card2Val,
+                        validMonth:validMonth2Val
+                    }
+                ]
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/users',
+                data: JSON.stringify(userObject),
+                contentType: 'application/json;charset=UTF-8',
+                success: function (result) {
+                    console.log(result);
+                    alert(result);
+                },
+                error: function (xhr, status, error) {
+                    alert('code: ' + xhr.status + '\n'
+                        + 'message: ' + xhr.responseText + '\n'
+                        + 'error: ' + error);
+                }
+            });
+        });
+    });
+
+    function xmlToString(xmlData) {
+        var xmlString;
+        if (window.ActiveXObject) {
+            xmlString = xmlData.xml;
+        } else {
+            xmlString = (new XMLSerializer()).serializeToString(xmlData);
+        }
+        return xmlString;
+    }
+</script>
+</body>
+</html>

@@ -1,9 +1,10 @@
 package org.shop.api.moduls.board;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter @Setter
 @ToString
@@ -18,7 +19,9 @@ public class Board implements Serializable {
     private String title;
     private String writer;
     private String content;
-    private LocalDateTime regDate;
-    private LocalDateTime updDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate regDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate updDate;
 
 }
