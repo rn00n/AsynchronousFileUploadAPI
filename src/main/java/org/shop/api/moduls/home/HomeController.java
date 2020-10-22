@@ -16,18 +16,9 @@ public class HomeController {
 		return "board";
 	}
 
-	@GetMapping("/image")
-	public String image() {
-		return "image";
+	@GetMapping("/item")
+	public String item() {
+		return "item";
 	}
 
-	@GetMapping("/user")
-	public String user() {
-		return "user";
-	}
-
-	@GetMapping("/greeting")
-	public String greeting() {
-		return "greeting";
-	}
 }

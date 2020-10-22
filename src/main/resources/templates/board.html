@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Home</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
@@ -10,56 +10,62 @@
     <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
 </head>
 <body>
+    <h1>Board Home</h1>
 
-    <h1>Board API</h1>
-    <div class="container">
-        <form>
-            <div class="form-group">
-                <label>게시판 번호</label>
-                <input class="form-control" type="text" id="boardNo" name="boardNo"/>
-            </div>
-            <div class="form-group">
-                <label>제목</label>
-                <input class="form-control" type="text" id="title" name="title"/>
-            </div>
-            <div class="form-group">
-                <label>내용</label>
-                <input class="form-control" type="text" id="content" name="content"/>
-            </div>
-            <div class="form-group">
-                <label>작성자</label>
-                <input class="form-control" type="text" id="writer" name="writer"/>
-            </div>
-        </form>
-        <div>
-            <button class="btn btn-outline-dark" id="listBtn">목록</button>
-            <button class="btn btn-outline-dark" id="registerBtn">등록</button>
-            <button class="btn btn-outline-dark" id="readBtn">조회</button>
-            <button class="btn btn-outline-dark" id="getToJsonBtn">조회Json</button>
-            <button class="btn btn-outline-dark" id="getToXmlBtn">조회Xml</button>
-            <button class="btn btn-outline-dark" id="modifyByJsonBtn">수정Json</button>
-            <button class="btn btn-outline-dark" id="modifyByXmlBtn">수정Xml</button>
-            <button class="btn btn-outline-dark" id="deleteBtn">삭제</button>
+    <form>
+        <div class="form-group">
+            <label>게시판 번호</label>
+            <input class="form-control" type="text" id="boardNo" name="boardNo"/>
         </div>
+        <div class="form-group">
+            <label>제목</label>
+            <input class="form-control" type="text" id="title" name="title"/>
+        </div>
+        <div class="form-group">
+            <label>내용</label>
+            <input class="form-control" type="text" id="content" name="content"/>
+        </div>
+        <div class="form-group">
+            <label>작성자</label>
+            <input class="form-control" type="text" id="writer" name="writer"/>
+        </div>
+    </form>
+    <div>
+        <button class="btn btn-outline-dark" id="listBtn">목록</button>
+        <button class="btn btn-outline-dark" id="registerBtn">등록</button>
+        <button class="btn btn-outline-dark" id="readBtn">조회</button>
+        <button class="btn btn-outline-dark" id="modifyBtn">수정</button>
+        <button class="btn btn-outline-dark" id="deleteBtn">삭제</button>
+        <button class="btn btn-outline-dark" id="resetBtn">입력삭제</button>
     </div>
 
-<!--    csrf token-->
-    <script type="application/javascript" th:inline="javascript">
-        $(function() {
-            var csrfToken = /*[[${_csrf.token}]]*/ null;
-            var csrfHeader = /*[[${_csrf.headerName}]]*/ null;
-            $(document).ajaxSend(function (e, xhr, options) {
-                xhr.setRequestHeader(csrfHeader, csrfToken);
-            });
-        });
-    </script>
-<!--    API 호출-->
-    <script type="text/javascript">
+    <script>
         $(document).ready(function () {
             $('#listBtn').on('click', function () {
-                $.get("/boards", function (data) {
+                $.get("/api/boards", function (data) {
                     console.log(data);
                     alert(JSON.stringify(data));
+                });
+            });
+            $('#readBtn').on('click', function () {
+                var boardNo = $('#boardNo');
+                var boardNoVal = boardNo.val();
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/boards/' + boardNoVal,
+                    contentType: 'application/json;charset=UTF-8',
+                    success: function (data) {
+                        console.log(data);
+                        alert(JSON.stringify(data));
+
+                        $('#title').val(data.title);
+                        $('#content').val(data.content);
+                        $('#writer').val(data.writer);
+                    },
+                    error: function (request, status, error) {
+                        alert('code: ' + request.status + '\n' + 'message: ' + request.responseText + '\n' + 'error: ' + error);
+                    }
                 });
             });
             $('#registerBtn').on('click', function () {
@@ -78,7 +84,7 @@
                 };
                 $.ajax({
                     type: 'POST',
-                    url: '/boards',
+                    url: '/api/boards',
                     data: JSON.stringify(boardObject),
                     contentType: 'application/json;charset=UTF-8',
                     success: function (result) {
@@ -90,66 +96,22 @@
                     }
                 });
             });
-            $('#readBtn').on('click', function () {
-                var boardNo = $('#boardNo');
-                var boardNoVal = boardNo.val();
-                console.log(boardNoVal);
-
-                $.get("/boards/" + boardNoVal, function (data) {
-                    console.log(data);
-                    alert(JSON.stringify(data));
-                });
-            });
-            $('#getToJsonBtn').on('click', function () {
-                var boardNo = $('#boardNo');
-                var boardNoVal = boardNo.val();
-                console.log(boardNoVal);
-                alert('json');
-                $.ajax({
-                    type: 'GET',
-                    url: '/boards/' + boardNoVal,
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    success: function (result) {
-                        console.log('result: ' + result);
-                        alert(JSON.stringify(result));
-                    }
-                });
-            });
-            $('#getToXmlBtn').on('click', function () {
-                var boardNo = $('#boardNo');
-                var boardNoVal = boardNo.val();
-                console.log(boardNoVal);
-                alert('xml');
-                $.ajax({
-                    type: 'GET',
-                    url: '/boards/' + boardNoVal,
-                    headers: {
-                        'Accept': 'application/xml'
-                    },
-                    success: function (result) {
-                        console.log('result: ' + result);
-                        alert(xmlToString(result));
-                    }
-                });
-            });
             $('#deleteBtn').on('click', function () {
                 var boardNo = $('#boardNo');
                 var boardNoVal = boardNo.val();
 
-                console.log(boardNoVal);
-
                 $.ajax({
                     type: 'DELETE',
-                    url: '/boards/' + boardNoVal,
-                    success: function (result) {
-                        console.log(result);
-                        alert(result);
+                    url: '/api/boards/' + boardNoVal,
+                    success: function () {
+                        alert('Deleted');
+                    },
+                    error: function (request, status, error) {
+                        alert('code: ' + request.status + '\n' + 'message: ' + request.responseText + '\n' + 'error: ' + error);
                     }
                 });
             });
-            $('#modifyByJsonBtn').on('click', function () {
+            $('#modifyBtn').on('click', function () {
                 var boardNo = $('#boardNo');
                 var title = $('#title');
                 var content = $('#content');
@@ -168,84 +130,29 @@
                 };
                 $.ajax({
                     type: 'PUT',
-                    url: '/boards/' + boardNoVal,
+                    url: '/api/boards/' + boardNoVal,
                     data: JSON.stringify(boardObject),
                     contentType: 'application/json;charset=UTF-8',
-                    success: function (result) {
-                        console.log(result);
-                        alert(result);
+                    success: function () {
+                        alert('Modified');
+                    },
+                    error: function (request, status, error) {
+                        alert('code: ' + request.status + '\n' + 'message: ' + request.responseText + '\n' + 'error: ' + error);
                     }
                 });
             });
-            $('#modifyByXmlBtn').on('click', function () {
+            $('#resetBtn').on('click', function () {
                 var boardNo = $('#boardNo');
                 var title = $('#title');
                 var content = $('#content');
                 var writer = $('#writer');
 
-                var boardNoVal = boardNo.val();
-                var titleVal = title.val();
-                var contentVal = content.val();
-                var writerVal = writer.val();
-
-                var xmlData = '<Board>';
-                xmlData += '<boardNo>0</boardNo>';
-                xmlData += '<title>title1</title>';
-                xmlData += '<content>content1</content>';
-                xmlData += '<writer>writer1</writer>';
-                xmlData += '<regDate>2018-12-10</regDate>';
-                xmlData += '</Board>';
-                $.ajax({
-                    type: 'PUT',
-                    url: '/boards/' + boardNoVal,
-                    data: xmlData,
-                    contentType: 'application/xml;charset=UTF-8',
-                    success: function (result) {
-                        console.log(result);
-                        alert(result);
-                    }
-                });
-            });
-            $('#postBtn').on('click', function () {
-                var boardNo = $('#boardNo')                                                                                                            ;
-                var title = $('#title')                                                                                                            ;
-                var content = $('#content')                                                                                                            ;
-                var writer = $('#writer')                                                                                                            ;
-
-                var boardNoVal = boardNo.val();
-                var titleVal = title.val();
-                var contentVal = content.val();
-                var writerVal = writer.val();
-
-                var boardObject = {
-                    boardNo: boardNoVal,
-                    title: titleVal,
-                    content: contentVal,
-                    writer: writerVal,
-                };
-
-                $.ajax({
-                    type: 'POST',
-                    url: '/boards/' + boardNoVal,
-                    data: JSON.stringify(boardObject),
-                    contentType: 'application/json;charset=UTF-8',
-                    success: function (result) {
-                        console.log('result: ', result);
-                        alert(result);
-                    }
-                });
+                var boardNoVal = boardNo.val('');
+                var titleVal = title.val('');
+                var contentVal = content.val('');
+                var writerVal = writer.val('');
             });
         });
-
-        function xmlToString(xmlData) {
-            var xmlString;
-            if (window.ActiveXObject) {
-                xmlString = xmlData.xml;
-            } else {
-                xmlString = (new XMLSerializer()).serializeToString(xmlData);
-            }
-            return xmlString;
-        }
     </script>
 </body>
 </html>
