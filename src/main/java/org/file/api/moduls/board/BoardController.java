@@ -1,8 +1,6 @@
 package org.file.api.moduls.board;
 
 import lombok.extern.java.Log;
-import org.shop.api.moduls.page.PageRequestVO;
-import org.shop.api.moduls.page.PaginationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +39,7 @@ public class BoardController {
 	public ResponseEntity<Board> read(@PathVariable("boardNo") Integer boardNo) {
 		Board board = boardService.read(boardNo);
 		ResponseEntity<Board> entity = new ResponseEntity<>(HttpStatus.OK);
+
 		return entity;
 	}
 

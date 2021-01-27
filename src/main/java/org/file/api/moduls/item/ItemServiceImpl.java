@@ -13,83 +13,83 @@ import java.util.List;
 @Transactional
 public class ItemServiceImpl implements ItemService {
 
-	@Autowired
-	private ItemRepository repository;
+    @Autowired
+    private ItemRepository repository;
 
-	@Override
-	public void regist(Item item) throws Exception {
-		Item itemEntity = new Item();
+    @Override
+    public void regist(Item item) throws Exception {
+        Item itemEntity = new Item();
 
-		itemEntity.setItemName(item.getItemName());
-		itemEntity.setPrice(item.getPrice());
-		itemEntity.setDescription(item.getDescription());
+        itemEntity.setItemName(item.getItemName());
+        itemEntity.setPrice(item.getPrice());
+        itemEntity.setDescription(item.getDescription());
 
-		String[] files = item.getFiles();
+        String[] files = item.getFiles();
 
-		if (files == null) {
-			return;
-		}
+        if (files == null) {
+            return;
+        }
 
-		for (String fileName : files) {
-			ItemFile itemFile = new ItemFile();
-			itemFile.setFullName(fileName);
+        for (String fileName : files) {
+            ItemFile itemFile = new ItemFile();
+            itemFile.setFullName(fileName);
 
-			itemEntity.addItemFile(itemFile);
-		}
+            itemEntity.addItemFile(itemFile);
+        }
 
-		repository.save(itemEntity);
-	}
+        repository.save(itemEntity);
+    }
 
-	@Override
-	public Item read(Long itemId) throws Exception {
-		return repository.getOne(itemId);
-	}
+    @Override
+    public Item read(Long itemId) throws Exception {
+        return repository.getOne(itemId);
+    }
 
-	@Override
-	public void modify(Item item) throws Exception {
-		Item itemEntity = repository.getOne(item.getItemId());
+    @Override
+    public void modify(Item item) throws Exception {
+        Item itemEntity = repository.getOne(item.getItemId());
 
-		itemEntity.setItemName(item.getItemName());
-		itemEntity.setPrice(item.getPrice());
-		itemEntity.setDescription(item.getDescription());
+        itemEntity.setItemName(item.getItemName());
+        itemEntity.setPrice(item.getPrice());
+        itemEntity.setDescription(item.getDescription());
 
-		String[] files = item.getFiles();
+        String[] files = item.getFiles();
 
-		if (files != null) {
-			itemEntity.clearItemFile();
+        if (files != null) {
+            itemEntity.clearItemFile();
 
-			for (String fileName : files) {
-				ItemFile itemFile = new ItemFile();
-				itemFile.setFullName(fileName);
+            for (String fileName : files) {
+                ItemFile itemFile = new ItemFile();
+                itemFile.setFullName(fileName);
 
-				itemEntity.addItemFile(itemFile);
-			}
-		}
-		repository.save(itemEntity);
-	}
+                itemEntity.addItemFile(itemFile);
+            }
+        }
+        repository.save(itemEntity);
+    }
 
-	@Override
-	public void remove(Long itemId) throws Exception {
-		repository.deleteById(itemId);
-	}
+    @Override
+    public void remove(Long itemId) throws Exception {
+        repository.deleteById(itemId);
+    }
 
-	@Override
-	public List<Item> list() throws Exception {
-		return repository.findAll(Sort.by(Direction.DESC, "itemId"));
-	}
+    @Override
+    public List<Item> list() throws Exception {
+        return repository.findAll(Sort.by(Direction.DESC, "itemId"));
+    }
 
-	@Override
-	public List<String> getAttach(Long itemId) throws Exception {
-		Item itemEntity = repository.getOne(itemId);
+    @Override
+    public List<String> getAttach(Long itemId) throws Exception {
+        Item itemEntity = repository.getOne(itemId);
 
-		List<ItemFile> itemFiles = itemEntity.getItemFiles();
+        List<ItemFile> itemFiles = itemEntity.getItemFiles();
 
-		List<String> attachList = new ArrayList<>();
-		for(ItemFile itemFile : itemFiles) {
-			attachList.add(itemFile.getFullName());
-		}
+        List<String> attachList = new ArrayList<>();
+        for (ItemFile itemFile : itemFiles) {
+            attachList.add(itemFile.getFullName());
+        }
 
-		return attachList;
-	}
+        return attachList;
+    }
 
 }

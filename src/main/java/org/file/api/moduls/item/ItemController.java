@@ -14,8 +14,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.List;
 
 @Log
@@ -97,8 +99,9 @@ public class ItemController {
 	@RequestMapping("/display")
 	public ResponseEntity<byte[]> display(String fileName) throws Exception {
 		InputStream in = null;
-		ResponseEntity<byte[]> entity = null;
 
+		ResponseEntity<byte[]> entity = null;
+		String s;
 		log.info("FILE NAME: " + fileName);
 
 		try {
@@ -120,12 +123,32 @@ public class ItemController {
 			}
 
 			entity = new ResponseEntity<byte[]>(IOUtils.toByteArray(in), headers, HttpStatus.CREATED);
+//			s = Base64.getEncoder().encodeToString(i);
 		} catch (Exception e) {
 			e.printStackTrace();
 			entity = new ResponseEntity<byte[]>(HttpStatus.BAD_REQUEST);
 		} finally {
 			in.close();
 		}
+
+
+		File f = new File(uploadPath + fileName);
+		if (f.isFile()) {
+			byte[] bytes = new byte[(int) f.length()];
+			FileInputStream fis = new FileInputStream(f);
+
+			try {
+				fis.read(bytes);
+				String str = new String(Base64.getEncoder().encodeToString(bytes));
+				System.out.println(str);
+			}
+			catch (Exception e) {
+
+			} finally {
+				fis.close();
+			}
+		}
+
 		return entity;
 	}
 
